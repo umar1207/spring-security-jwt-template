@@ -15,9 +15,11 @@ import lombok.NoArgsConstructor;
 public class UserInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
     private String name;
     private String email;
     private String password;
     private String roles;
+    // single role, if you want to change this do make sure to edit the
+    // userInfoDetails Constructor accordingly
 }

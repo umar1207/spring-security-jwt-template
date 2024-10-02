@@ -1,6 +1,6 @@
 package dev.project.security.controller;
 
-import dev.project.security.entity.AuthRequest;
+import dev.project.security.dto.LoginRequestDto;
 import dev.project.security.entity.UserInfo;
 import dev.project.security.service.JwtService;
 import dev.project.security.service.UserInfoService;
@@ -28,31 +28,33 @@ public class UserController {
         return ResponseEntity.ok("Unsecured endpoint");
     }
 
-    @PostMapping("/addNewUser")
-    public ResponseEntity<?> addNewUser(@RequestBody UserInfo userInfo){
-        return ResponseEntity.ok(service.addUser(userInfo));
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody UserInfo userInfo){
+        return ResponseEntity.ok(service.register(userInfo));
     }
 
-    @GetMapping("/user/userProfile")
-    @PreAuthorize("hasAuthority('ROLE_USER')")
-    public ResponseEntity<?> userProfile(){
-        return ResponseEntity.ok("Welcome to user profile");
-    }
-
-    @GetMapping("/admin/adminProfile")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<?> adminProfile(){
-        return ResponseEntity.ok("Welcome to admin profile");
-    }
-    @PostMapping("/generateToken")
-    public String authenticateAndGetToken(@RequestBody AuthRequest authRequest){
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto){
         Authentication authentication = authenticationManager.authenticate(
-          new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
+                new UsernamePasswordAuthenticationToken(loginRequestDto.getUsername(), loginRequestDto.getPassword())
         );
         if(authentication.isAuthenticated()){
-            return jwtService.generateToken(authRequest.getUsername());
+            return ResponseEntity.ok(jwtService.generateToken(loginRequestDto.getUsername()));
         }else{
             throw new UsernameNotFoundException("invalid Request");
         }
     }
+
+    @GetMapping("/user/user-endpoint")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public ResponseEntity<?> userProfile(){
+        return ResponseEntity.ok("Example of User API");
+    }
+
+    @GetMapping("/admin/admin-endpoint")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<?> adminProfile(){
+        return ResponseEntity.ok("Example of Admin API");
+    }
+
 }
